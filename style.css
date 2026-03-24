@@ -1,0 +1,228 @@
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --primary:  #3a8cc8;
+  --bright:   #5aaae0;
+  --silver:   #a8c8e8;
+  --dark:     #040c18;
+  --panel:    rgba(4,12,24,.92);
+  --border:   rgba(58,140,200,.28);
+  --danger:   #e04060;
+  --gold:     #e8c040;
+  --success:  #40c880;
+  --font:     'Segoe UI', Arial, sans-serif;
+}
+
+html,body{width:100%;height:100%;background:var(--dark);color:var(--silver);font-family:var(--font);overflow:hidden;user-select:none;}
+
+/* ── Login Screen ─────────────────────────────────────────────────────────── */
+#login-screen{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  z-index:10;
+  transition:opacity .4s ease;
+}
+
+.login-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 38%,#080f1e 0%,#020609 100%);
+  overflow:hidden;
+}
+/* Animated grid */
+.login-bg::before{
+  content:'';position:absolute;inset:-60px;
+  background-image:
+    linear-gradient(rgba(58,140,200,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(58,140,200,.055) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:grid-move 20s linear infinite;
+}
+/* Radial pulse */
+.login-bg::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 48%,rgba(58,140,200,.07) 0%,transparent 60%);
+  animation:pulse-glow 5s ease-in-out infinite;
+}
+@keyframes grid-move  {to{transform:translate(60px,60px);}}
+@keyframes pulse-glow {0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── Login card ───────────────────────────────────────────────────────────── */
+.login-card{
+  position:relative;z-index:1;
+  background:rgba(4,12,24,.93);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:40px 40px 36px;
+  width:440px;
+  text-align:center;
+  box-shadow:0 0 50px rgba(58,140,200,.08),0 0 120px rgba(58,140,200,.04),inset 0 1px 0 rgba(58,140,200,.07);
+}
+
+/* ── Logo (shield style matching the logo image) ─────────────────────────── */
+.logo-wrap{margin-bottom:28px;}
+
+.logo-shield{
+  display:inline-block;
+  padding:16px 32px 14px;
+  background:linear-gradient(160deg,#1a3a5c 0%,#0e2038 100%);
+  border:2px solid rgba(90,170,224,.5);
+  border-radius:12px 12px 18px 18px;
+  position:relative;
+  box-shadow:0 0 30px rgba(58,140,200,.18),inset 0 1px 0 rgba(90,170,224,.15);
+}
+.logo-shield::before{
+  content:'';position:absolute;inset:3px;
+  border:1px solid rgba(168,200,232,.1);
+  border-radius:10px 10px 16px 16px;
+  pointer-events:none;
+}
+
+.logo-figure{
+  font-size:28px;color:var(--silver);
+  text-shadow:0 0 20px rgba(90,170,224,.8);
+  margin-bottom:2px;
+  filter:drop-shadow(0 0 8px rgba(58,140,200,.9));
+}
+
+.logo-text{
+  font-size:36px;font-weight:900;letter-spacing:5px;
+  background:linear-gradient(180deg,#e8f0f8 0%,#7ab8e0 60%,#3a8cc8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-shadow:none;
+  line-height:1;
+}
+.logo-text span{
+  background:linear-gradient(180deg,#c0dff5 0%,#5aaae0 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.logo-stars{
+  font-size:10px;color:var(--silver);letter-spacing:8px;
+  margin-top:6px;opacity:.7;
+  text-shadow:0 0 8px rgba(168,200,232,.6);
+}
+
+/* ── Input ────────────────────────────────────────────────────────────────── */
+.field{margin-bottom:8px;}
+
+#username-input{
+  width:100%;padding:13px 18px;
+  background:rgba(0,0,0,.45);
+  border:1px solid var(--border);
+  border-radius:9px;color:#fff;
+  font-size:15px;font-family:var(--font);
+  outline:none;cursor:text;
+  transition:border-color .2s,box-shadow .2s;
+}
+#username-input:focus{border-color:var(--bright);box-shadow:0 0 14px rgba(90,170,224,.2);}
+#username-input::placeholder{color:rgba(168,200,232,.25);}
+
+.error-msg{min-height:18px;font-size:12px;color:var(--danger);margin-bottom:10px;text-align:center;}
+
+/* ── Party code row ────────────────────────────────────────────────────────── */
+.party-row{margin-bottom:12px;}
+.party-code-input{
+  width:100%;padding:10px 18px;
+  background:rgba(0,0,0,.4);
+  border:1px solid var(--border);
+  border-radius:9px;color:var(--silver);
+  font-size:13px;font-family:var(--font);letter-spacing:3px;text-transform:uppercase;
+  outline:none;cursor:text;
+  transition:border-color .2s,box-shadow .2s;
+}
+.party-code-input:focus{border-color:var(--bright);box-shadow:0 0 12px rgba(90,170,224,.18);}
+.party-code-input::placeholder{color:rgba(168,200,232,.22);letter-spacing:1px;text-transform:none;}
+
+/* ── Loadout ──────────────────────────────────────────────────────────────── */
+.loadout-section{
+  background:rgba(0,0,0,.3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px 16px 12px;
+  margin-bottom:16px;
+  text-align:left;
+}
+.loadout-title{
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  color:var(--primary);margin-bottom:12px;text-align:center;
+}
+.loadout-row{display:flex;gap:10px;}
+.loadout-col{flex:1;display:flex;flex-direction:column;gap:4px;}
+.loadout-col label{font-size:10px;color:rgba(168,200,232,.55);letter-spacing:.5px;}
+
+.loadout-select{
+  width:100%;padding:7px 10px;
+  background:rgba(0,0,0,.5);
+  border:1px solid var(--border);
+  border-radius:7px;color:var(--silver);
+  font-size:11px;font-family:var(--font);
+  outline:none;cursor:pointer;
+  transition:border-color .2s;
+  appearance:none;
+}
+.loadout-select:focus{border-color:var(--bright);}
+.loadout-select option{background:#0a1828;color:var(--silver);}
+
+/* ── Play button ──────────────────────────────────────────────────────────── */
+#play-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#1e4a78 0%,var(--bright) 100%);
+  border:none;border-radius:9px;
+  color:#fff;font-size:17px;font-weight:700;letter-spacing:2.5px;
+  cursor:pointer;
+  box-shadow:0 0 24px rgba(58,140,200,.28);
+  transition:transform .15s,box-shadow .15s;
+  margin-bottom:22px;
+}
+#play-btn:hover {transform:translateY(-2px);box-shadow:0 0 40px rgba(90,170,224,.45);}
+#play-btn:active{transform:translateY(0);}
+
+/* ── Controls hint ────────────────────────────────────────────────────────── */
+.controls{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:12px 20px;
+}
+.ctrl-item{font-size:11px;color:rgba(168,200,232,.32);}
+
+kbd{
+  display:inline-block;padding:1px 7px;
+  background:rgba(58,140,200,.1);
+  border:1px solid var(--border);
+  border-radius:4px;font-size:10px;
+  font-family:var(--font);color:var(--bright);
+  margin-right:4px;
+}
+
+/* ── Shake ────────────────────────────────────────────────────────────────── */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease;}
+
+/* ── Canvas ───────────────────────────────────────────────────────────────── */
+#game-canvas{
+  position:fixed;inset:0;
+  display:none;width:100%;height:100%;
+  cursor:none;
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ── Mobile responsive ───────────────────────────────────────────────────── */
+@media(max-width:480px){
+  .login-card{
+    width:94vw;max-width:440px;
+    padding:28px 18px 24px;
+    border-radius:14px;
+    max-height:96vh;overflow-y:auto;
+  }
+  .logo-text{font-size:28px;letter-spacing:3px;}
+  .logo-shield{padding:12px 20px 10px;}
+  .loadout-row{flex-wrap:wrap;}
+  .loadout-col{min-width:calc(50% - 5px);}
+  #play-btn{font-size:15px;padding:12px;}
+  .controls{display:none;}
+  #username-input{font-size:14px;padding:11px 14px;}
+  .party-code-input{font-size:12px;padding:8px 14px;}
+}
+@media(max-width:360px){
+  .loadout-col{min-width:100%;}
+}

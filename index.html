@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ZapZone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+
+    <div class="logo-wrap">
+      <div class="logo-shield">
+        <div class="logo-figure">&#9651;</div>
+        <div class="logo-text">ZAP<span>ZONE</span></div>
+        <div class="logo-stars">&#9733; &#9733; &#9733;</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <input id="username-input" type="text" placeholder="Enter username" maxlength="20" autocomplete="off" spellcheck="false" inputmode="text">
+    </div>
+    <div id="error-msg" class="error-msg"></div>
+
+    <!-- Party code row -->
+    <div class="party-row">
+      <input id="party-input" type="text" placeholder="Party code (optional)" maxlength="6" autocomplete="off" spellcheck="false" class="party-code-input">
+    </div>
+
+    <div class="loadout-section">
+      <div class="loadout-title">LOADOUT &amp; MODE</div>
+      <div class="loadout-row">
+        <div class="loadout-col">
+          <label>Game Mode</label>
+          <select id="mode-select" class="loadout-select"></select>
+        </div>
+        <div class="loadout-col">
+          <label>Ability Q</label>
+          <select id="ab1-select" class="loadout-select"></select>
+        </div>
+        <div class="loadout-col">
+          <label>Ability E</label>
+          <select id="ab2-select" class="loadout-select"></select>
+        </div>
+        <div class="loadout-col">
+          <label>Spawn Weapon</label>
+          <select id="weapon-select" class="loadout-select"></select>
+        </div>
+      </div>
+    </div>
+
+    <button id="play-btn">PLAY NOW</button>
+
+    <div class="controls">
+      <div class="ctrl-item"><kbd>WASD</kbd>Move</div>
+      <div class="ctrl-item"><kbd>Mouse</kbd>Aim</div>
+      <div class="ctrl-item"><kbd>Click</kbd>Shoot</div>
+      <div class="ctrl-item"><kbd>Q/E</kbd>Abilities</div>
+      <div class="ctrl-item"><kbd>B</kbd>Shop</div>
+      <div class="ctrl-item"><kbd>F</kbd>Friends</div>
+      <div class="ctrl-item"><kbd>P</kbd>Party</div>
+      <div class="ctrl-item"><kbd>O</kbd>Settings</div>
+    </div>
+  </div>
+</div>
+
+<canvas id="game-canvas"></canvas>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="game.js"></script>
+<script>
+const loginScreen   = document.getElementById('login-screen');
+const gameCanvas    = document.getElementById('game-canvas');
+const playBtn       = document.getElementById('play-btn');
+const usernameInput = document.getElementById('username-input');
+const errorMsg      = document.getElementById('error-msg');
+const ab1Select     = document.getElementById('ab1-select');
+const ab2Select     = document.getElementById('ab2-select');
+const weaponSelect  = document.getElementById('weapon-select');
+const modeSelect    = document.getElementById('mode-select');
+const partyInput    = document.getElementById('party-input');
+
+const MODES_LIST = [
+  {key:'ffa',      name:'Free For All'},
+  {key:'practice', name:'Practice vs Bots'},
+  {key:'tdm',      name:'Team Deathmatch'},
+  {key:'br',       name:'Battle Royale'},
+  {key:'1v1',      name:'1v1'},
+  {key:'2v2',      name:'2v2'},
+  {key:'3v3',      name:'3v3'},
+  {key:'4v4',      name:'4v4'},
+  {key:'5v5',      name:'5v5'},
+];
+
+const ABILITIES_LIST = [
+  {key:'dash_burst',name:'Dash Burst'},{key:'blink_step',name:'Blink Step'},
+  {key:'chain_lightning',name:'Chain Lightning'},{key:'shockwave_slam',name:'Shockwave Slam'},
+  {key:'energy_dome',name:'Energy Dome'},{key:'heal_surge',name:'Heal Surge'},
+  {key:'overload_shot',name:'Overload Shot'},{key:'phase_shift',name:'Phase Shift'},
+  {key:'sky_launch',name:'Sky Launch'},{key:'scan_pulse',name:'Scan Pulse'},
+  {key:'emp_blast',name:'EMP Blast'},{key:'static_trap',name:'Static Trap'},
+];
+
+for(const m of MODES_LIST) modeSelect.innerHTML+=`<option value="${m.key}">${m.name}</option>`;
+for(const a of ABILITIES_LIST){ ab1Select.innerHTML+=`<option value="${a.key}">${a.name}</option>`; ab2Select.innerHTML+=`<option value="${a.key}">${a.name}</option>`; }
+ab2Select.value='energy_dome';
+
+function populateWeapons(unlocked=['pulse_rifle','shock_blaster']){
+  weaponSelect.innerHTML='';
+  for(const wk of unlocked){ const label=wk.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); weaponSelect.innerHTML+=`<option value="${wk}">${label}</option>`; }
+}
+populateWeapons();
+
+window.onPlayerJoined=function(dbData){ if(dbData?.unlocked_weapons) populateWeapons(dbData.unlocked_weapons); };
+
+usernameInput.addEventListener('keydown',e=>{if(e.key==='Enter')tryJoin();});
+playBtn.addEventListener('click',tryJoin);
+
+function tryJoin(){
+  const raw=usernameInput.value.trim();
+  if(!raw){shake();errorMsg.textContent='Enter a username first!';return;}
+  if(raw.length<2){shake();errorMsg.textContent='Min 2 characters';return;}
+  errorMsg.textContent='';
+  gameCanvas.width=window.innerWidth; gameCanvas.height=window.innerHeight;
+  loginScreen.style.opacity='0'; loginScreen.style.pointerEvents='none';
+  setTimeout(()=>{loginScreen.style.display='none';gameCanvas.style.display='block';},400);
+  window._pendingLoadout={ab1:ab1Select.value,ab2:ab2Select.value,spawnWeapon:weaponSelect.value,mode:modeSelect.value,partyCode:partyInput.value.trim().toUpperCase()||null};
+  socket.emit('join',{username:raw,mode:modeSelect.value,partyCode:partyInput.value.trim().toUpperCase()||null});
+}
+function shake(){const c=document.querySelector('.login-card');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');}
+</script>
+</body>
+</html>
